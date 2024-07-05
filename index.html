@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .calculator {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .display {
+            background-color: #222;
+            color: white;
+            text-align: right;
+            padding: 20px;
+            font-size: 2em;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+        .button {
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #ddd;
+        }
+        .button.operator {
+            background-color: #ff9500;
+            color: white;
+        }
+        .button.operator:hover {
+            background-color: #e08b00;
+        }
+        .button.double {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="button" onclick="clearDisplay()">C</button>
+            <button class="button" onclick="deleteDigit()">DEL</button>
+            <button class="button" onclick="percentage()">%</button>
+            <button class="button operator" onclick="appendOperator('/')">/</button>
+            
+            <button class="button" onclick="appendDigit(7)">7</button>
+            <button class="button" onclick="appendDigit(8)">8</button>
+            <button class="button" onclick="appendDigit(9)">9</button>
+            <button class="button operator" onclick="appendOperator('*')">*</button>
+            
+            <button class="button" onclick="appendDigit(4)">4</button>
+            <button class="button" onclick="appendDigit(5)">5</button>
+            <button class="button" onclick="appendDigit(6)">6</button>
+            <button class="button operator" onclick="appendOperator('-')">-</button>
+            
+            <button class="button" onclick="appendDigit(1)">1</button>
+            <button class="button" onclick="appendDigit(2)">2</button>
+            <button class="button" onclick="appendDigit(3)">3</button>
+            <button class="button operator" onclick="appendOperator('+')">+</button>
+            
+            <button class="button double" onclick="appendDigit(0)">0</button>
+            <button class="button" onclick="appendDigit('.')">.</button>
+            <button class="button operator" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '0';
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function deleteDigit() {
+            currentInput = currentInput.slice(0, -1) || '0';
+            updateDisplay();
+        }
+
+        function appendDigit(digit) {
+            if (currentInput === '0' && digit !== '.') {
+                currentInput = digit.toString();
+            } else {
+                currentInput += digit;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(operator) {
+            if ('+-*/'.includes(currentInput.slice(-1))) {
+                currentInput = currentInput.slice(0, -1) + operator;
+            } else {
+                currentInput += operator;
+            }
+            updateDisplay();
+        }
+
+        function calculate() {
+            try {
+                currentInput = eval(currentInput).toString();
+            } catch {
+                currentInput = 'Error';
+            }
+            updateDisplay();
+        }
+
+        function percentage() {
+            try {
+                let lastChar = currentInput.slice(-1);
+                if ('+-*/'.includes(lastChar)) {
+                    currentInput = currentInput.slice(0, -1);
+                }
+                let components = currentInput.split(/(\+|\-|\*|\/)/);
+                if (components.length === 3) {
+                    let num = parseFloat(components[0]);
+                    let operator = components[1];
+                    let percentValue = parseFloat(components[2]);
+                    if (!isNaN(num) && !isNaN(percentValue)) {
+                        switch (operator) {
+                            case '+':
+                                currentInput = (num + (num * percentValue / 100)).toString();
+                                break;
+                            case '-':
+                                currentInput = (num - (num * percentValue / 100)).toString();
+                                break;
+                            case '*':
+                                currentInput = (num * (percentValue / 100)).toString();
+                                break;
+                            case '/':
+                                currentInput = (num / (percentValue / 100)).toString();
+                                break;
+                        }
+                    }
+                } else {
+                    currentInput = (parseFloat(currentInput) / 100).toString();
+                }
+            } catch {
+                currentInput = 'Error';
+            }
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
